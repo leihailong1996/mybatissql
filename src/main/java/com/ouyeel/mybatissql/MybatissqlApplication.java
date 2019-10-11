@@ -33,7 +33,7 @@ public class MybatissqlApplication {
     public static void main(String[] args)  throws  Exception{
 
 
-//        SpringApplication.run(MybatissqlApplication.class, args);
+//        SpringApplication.run(MybatissqlApplication.class, args);//1
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println("=============================================================");
         System.out.println("开始启动获取sql，现在时间是："+formatter.format(new Date()));
