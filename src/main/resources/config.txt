@@ -1,0 +1,1 @@
+/home/otcadmin/pythonMybatis/mybatis-mapper2sql-master/test1.py
