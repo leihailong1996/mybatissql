@@ -8,6 +8,7 @@ import java.sql.Statement;
 
 public class JDBCUtils {
     private static final String connectionURL = "jdbc:mysql://10.60.145.94:3306/xservices_deploy?useUnicode=true&characterEncoding=utf8";
+    //private static final String connectionURL = "jdbc:mysql://10.60.145.94:3306/hahaha?useUnicode=true&characterEncoding=utf8";
     private static final String username = "root";
     private static final String password = "root";
     
@@ -16,7 +17,6 @@ public class JDBCUtils {
         try {
             return   DriverManager.getConnection(connectionURL,username,password);
         } catch (Exception e) {
-            
             e.printStackTrace();
         }
         return null;

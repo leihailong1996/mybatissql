@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 public class SqlSource {
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://10.60.145.94:3306/xservices_deploy?useUnicode=true&characterEncoding=utf8";
+//    static final String DB_URL = "jdbc:mysql://10.60.145.94:3306/hahaha?useUnicode=true&characterEncoding=utf8&nullCatalogMeansCurrent=true";
     static final String USER = "root";
     static final String PASS = "root";
 
@@ -42,17 +43,40 @@ public class SqlSource {
         List<SqlTable> sqls=new ArrayList<SqlTable>();
         SqlTable sqlTable;
         String key="";
+        String sqlTemp="";//临时sql字符串
         try {
             URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            getUnknowFilePath(classesUrl,"/WEB-INF/classes");
-            System.out.println("获取的路径urlBig============"+urlBig);
-            String url=urlBig.substring(0,urlBig.lastIndexOf("/WEB-INF/classes"));
-            File classesFile = new File(url+"/WEB-INF/classes");
+//            getUnknowFilePath(classesUrl,"/WEB-INF/classes");
+//            System.out.println("获取的路径urlBig============"+urlBig);
+//            String url=urlBig.substring(0,urlBig.lastIndexOf("/WEB-INF/classes"));
+//            File classesFile = new File(url+"/WEB-INF/classes");
+//            Method add = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
+//            add.setAccessible(true);
+//            add.invoke(classLoader, classesFile.toURI().toURL());
+//            //项目的lib文件
+//            File pathLib = new File(url+"/WEB-INF/lib");
+//            if(pathLib.exists()){
+//                if(pathLib.listFiles().length>0){
+//                    for (File file : pathLib.listFiles()) {
+//                        add.invoke(classLoader, file.toURI().toURL());
+//                    }
+//                }
+//            }
+            String strSplit="/src/main";
+            getUnknowFilePath(classesUrl,strSplit);
+            System.out.println("classesUrl===="+classesUrl);
+
+            String url=urlBig.substring(0,urlBig.lastIndexOf(strSplit));
+            System.out.println("===================================");
+            System.out.println("urlBig=="+urlBig);
+            System.out.println("url接近具体url=="+url);
+            System.out.println("===================================");
+            File classesFile = new File(url+strSplit);
             Method add = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
             add.setAccessible(true);
             add.invoke(classLoader, classesFile.toURI().toURL());
             //项目的lib文件
-            File pathLib = new File(url+"/WEB-INF/lib");
+            File pathLib = new File(url+strSplit);
             if(pathLib.exists()){
                 if(pathLib.listFiles().length>0){
                     for (File file : pathLib.listFiles()) {
@@ -61,9 +85,12 @@ public class SqlSource {
                 }
             }
             PathMatchingResourcePatternResolver resolver=new PathMatchingResourcePatternResolver();
-            Resource[] resourcesMapper = resolver.getResources("file:"+url+"/**/mapp*/*.xml");
-            Resource[] resourcesMapperSql = resolver.getResources("file:"+url+"/**/mapp*/*/*.xml");
-            Resource[] resourcesSql = resolver.getResources("file:"+url+"/**/*Mapper.xml");
+//            Resource[] resourcesMapper = resolver.getResources("file:"+url+"/**/mapp*/*.xml");
+//            Resource[] resourcesMapperSql = resolver.getResources("file:"+url+"/**/mapp*/*/*.xml");
+//            Resource[] resourcesSql = resolver.getResources("file:"+url+"/**/*Mapper.xml");
+            Resource[] resourcesMapper = resolver.getResources("file:"+urlBig+"/**/mapp*/*.xml");
+            Resource[] resourcesMapperSql = resolver.getResources("file:"+urlBig+"/**/mapp*/*/*.xml");
+            Resource[] resourcesSql = resolver.getResources("file:"+urlBig+"/**/*Mapper.xml");
             Resource[] resourcesBig = new Resource[resourcesMapper.length+resourcesMapperSql.length+resourcesSql.length];
 
             for(int i=0;i<resourcesBig.length;i++ ) {
@@ -111,10 +138,19 @@ public class SqlSource {
                         sqlTable.setName(name);
                         sqlTable.setModule_ename(projectName);
                         sqlTable.setFileName(xmlPath);
-                        sqlTable.setFlag('3');
-                        String path=xmlPath.substring(xmlPath.lastIndexOf("classes/")+8,xmlPath.length())+"/"+str;
+                        sqlTable.setFlag('3');///WEB-INF/classes
+                        String path=xmlPath.substring(xmlPath.lastIndexOf("src/"),xmlPath.length())+"/"+str;
                         sqlTable.setPath(path.replaceAll("/","."));
-                        sqlTable.setSql(map.get(str));
+                        sqlTemp=map.get(str).replaceAll("&gt;",">");
+                        sqlTemp=sqlTemp.replaceAll("&lt;","<");
+                        sqlTable.setSql(sqlTemp);
+
+//                        Map<String, Object> updateSqlUserInfoMap = getUpdateSqlUserInfo("/home/otcadmin/deploy/deploy-home/target/temp/shgt-service-search/20191014051607/src/main/resources/mapping/ShopSignZsteelMapper.xml", "updateByPrimaryKeySelective");
+                       /* Map<String, Object> updateSqlUserInfoMap = getUpdateSqlUserInfo(xmlPath, str);
+                        System.out.println("xmlPath=="+xmlPath+"    str="+str);
+                        sqlTable.setSvnLastModifiedPerson(updateSqlUserInfoMap.get("lastUserName").toString());
+                        sqlTable.setSvnVersion(updateSqlUserInfoMap.get("lastVersion").toString());
+                        sqlTable.setMethod(updateSqlUserInfoMap.get("methonName").toString());*/
                         sqls.add(sqlTable);
                     }
                 }
@@ -298,6 +334,7 @@ public class SqlSource {
             // 注册 JDBC 驱动
             Class.forName(JDBC_DRIVER);
             // 打开链接
+//            conn = DriverManager.getConnection(DB_URL,USER,PASS);
             conn = DriverManager.getConnection(DB_URL,USER,PASS);
             // 执行添加
             stmt = conn.createStatement();
@@ -384,14 +421,13 @@ public class SqlSource {
         SqlTable sqlTable=new SqlTable();
         sqlTable.setChangeNum(0);
         //注册驱动    使用驱动连接数据库
-        PreparedStatement stmt = null;
+        Statement stmt = null;
         ResultSet rs = null;
         try {
             if(con==null){
                 con = JDBCUtils.getConnection();
             }
-
-            stmt = con.prepareStatement(sql);
+            stmt = con.createStatement();
             rs=stmt.executeQuery(sql);
             while (rs.next()) {
                 String sqlPropertyTemp =rs.getString(property).toString();
@@ -403,16 +439,16 @@ public class SqlSource {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        }/*finally {
             try {
                 //JDBCUtils.close(rs, stmt, con);
                 if(rs!=null)
-                     rs.close();
+                    rs.close();
                 if(stmt!=null)
                     stmt.close();
             }catch (SQLException e){
             }
-        }
+        }*/
         return  sqlTable;
     }
 
@@ -425,13 +461,20 @@ public class SqlSource {
      */
     public static String getUnknowFilePath(String ageKnowFile,String afterKnowFile){
         String url="";
+        String strTemp="";//临时判断用的
         File path = new File(ageKnowFile);
+        File path1 = new File(ageKnowFile+afterKnowFile);
+        if(path1.exists()){
+            urlBig=ageKnowFile+afterKnowFile;
+            return ageKnowFile+afterKnowFile;
+        }
         if(path.exists()){
             File[] files = path.listFiles();
             if(files.length>0){
                 for(int i =0;i<files.length;i++){
                     File sonFile=files[i];
-                    if(sonFile.isDirectory()){
+                    strTemp=sonFile.getPath().substring(ageKnowFile.length(),sonFile.getPath().length());
+                    if(sonFile.isDirectory() && strTemp.contains("-service")){
                         File newFile=new File(sonFile.toString()+afterKnowFile);
                         if(newFile.exists()){
                             urlBig=sonFile.toString()+afterKnowFile;
@@ -589,6 +632,71 @@ public class SqlSource {
                 String s = m.get(str);
                 map.put(str,m.get(str));
             }
+        }
+        return map;
+    }
+
+    /**
+     * 获取更新代码的最后一个人
+     * @param xmlPath
+     * @param mapperKey
+     * @return
+     */
+    public static  Map<String ,Object> getUpdateSqlUserInfo(String xmlPath,String mapperKey){
+        xmlPath=xmlPath.replaceAll(" ","");
+        Map<String ,Object> map =new HashMap<String ,Object>();
+        int lastVersion=0;//最后修改的版本
+        String lastName="";//最后一个修改人
+        String methonName="";//方法名字：增删改查
+        int tempVersion=0;//临时数据
+        String tempStr="";//临时字符串，临时行
+        try {
+
+            //执行在cmd执行svn命令 window
+//            Process process = Runtime.getRuntime().exec("cmd.exe  /c svn blame  "+xmlPath);
+            String str=" svn blame "+xmlPath;
+            String[] cmd = new String[]{"sh","-c",str};
+            //linux 系统
+            Process process = Runtime.getRuntime().exec(cmd);
+            InputStream in = process.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String line = br.readLine();
+            boolean flag=false;
+            while(line!=null) {
+                tempStr=line.replaceAll(" ","");
+                if(tempStr.contains("id=\""+mapperKey+"\"")|| tempStr.contains("id='"+mapperKey+"'") || flag){
+                    if(tempStr.contains("<insert")){
+                        methonName="insert";
+                        flag=true;
+                    }else if(tempStr.contains("<update")){
+                        methonName="update";
+                        flag=true;
+                    }else if(tempStr.contains("<select")){
+                        methonName="select";
+                        flag=true;
+                    }else if(tempStr.contains("<delete")){
+                        methonName="delete";
+                        flag=true;
+                    }
+                    if(tempStr.contains("insert>") || tempStr.contains("update>") || tempStr.contains("select>") || tempStr.contains("delete>")){
+                        flag=false;
+                    }
+                    line=line.trim();
+                    String[] sz=line.split("\\s+");
+                    tempVersion=Integer.parseInt(sz[0]);
+                    if(tempVersion>lastVersion){
+                        lastVersion=tempVersion;
+                        lastName=sz[1];
+                    }
+                }
+                line = br.readLine();
+            }
+            in.close();
+            map.put("lastVersion",lastVersion);
+            map.put("lastUserName",lastName);
+            map.put("methonName",methonName);
+        }catch (Exception e) {
+            e.printStackTrace();;
         }
         return map;
     }

@@ -13,22 +13,11 @@ public class SqlTable {
     private int   changeNum;
     private char   flag;
     private String   fileName;
+    private String   svnVersion;
+    private String   svnLastModifiedPerson;
+    private String   sqlMethod;
 
-    @Override
-    public String toString() {
-        return "SqlTable{" +
-                "id=" + id +
-                ", create_Date=" + create_Date +
-                ", last_modified_Date=" + last_modified_Date +
-                ", module_ename='" + module_ename + '\'' +
-                ", sql='" + sql + '\'' +
-                ", path='" + path + '\'' +
-                ", name='" + name + '\'' +
-                ", changeNum=" + changeNum +
-                ", flag=" + flag +
-                ", fileName='" + fileName + '\'' +
-                '}';
-    }
+
 
     public int getId() {
         return id;
@@ -108,5 +97,48 @@ public class SqlTable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getSvnVersion() {
+        return svnVersion;
+    }
+
+    public void setSvnVersion(String svnVersion) {
+        this.svnVersion = svnVersion;
+    }
+
+    public String getSvnLastModifiedPerson() {
+        return svnLastModifiedPerson;
+    }
+
+    public void setSvnLastModifiedPerson(String svnLastModifiedPerson) {
+        this.svnLastModifiedPerson = svnLastModifiedPerson;
+    }
+
+    public String getSqlMethod() {
+        return sqlMethod;
+    }
+
+    public void setSqlMethod(String sqlMethod) {
+        this.sqlMethod = sqlMethod;
+    }
+
+    @Override
+    public String toString() {
+        return "SqlTable{" +
+                "id=" + id +
+                ", create_Date=" + create_Date +
+                ", last_modified_Date=" + last_modified_Date +
+                ", module_ename='" + module_ename + '\'' +
+                ", sql='" + sql + '\'' +
+                ", path='" + path + '\'' +
+                ", name='" + name + '\'' +
+                ", changeNum=" + changeNum +
+                ", flag=" + flag +
+                ", fileName='" + fileName + '\'' +
+                ", svnVersion='" + svnVersion + '\'' +
+                ", svnLastModifiedPerson='" + svnLastModifiedPerson + '\'' +
+                ", sqlMethod='" + sqlMethod + '\'' +
+                '}';
     }
 }
