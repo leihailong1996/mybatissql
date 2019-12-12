@@ -62,7 +62,8 @@ public class SqlSource {
 //                    }
 //                }
 //            }
-            String strSplit="/src/main";
+//            String strSplit="/src/main";
+            String strSplit="/src";
             getUnknowFilePath(classesUrl,strSplit);
             System.out.println("classesUrl===="+classesUrl);
 
@@ -91,9 +92,10 @@ public class SqlSource {
             Resource[] resourcesMapper = resolver.getResources("file:"+urlBig+"/**/mapp*/*.xml");
             Resource[] resourcesMapperSql = resolver.getResources("file:"+urlBig+"/**/mapp*/*/*.xml");
             Resource[] resourcesSql = resolver.getResources("file:"+urlBig+"/**/*Mapper.xml");
-            Resource[] resourcesBig = new Resource[resourcesMapper.length+resourcesMapperSql.length+resourcesSql.length];
-
-            for(int i=0;i<resourcesBig.length;i++ ) {
+            Resource[] resourcesSqlSql = resolver.getResources("file:"+urlBig+"/**/sql/*.xml");
+            Resource[] resourcesBig = new Resource[resourcesMapper.length+resourcesMapperSql.length+resourcesSql.length+resourcesSqlSql.length];
+            System.out.println("resourcesMapper="+resourcesMapper.length+" resourcesMapperSql="+resourcesMapperSql.length+" resourcesSql="+resourcesSql.length+" resourcesSqlSql="+resourcesSqlSql.length+" resourcesBig="+resourcesBig.length);
+           /* for(int i=0;i<resourcesBig.length;i++ ) {
                 if (resourcesMapper.length > 0 && resourcesMapper.length > i) {
                     resourcesBig[i] = resourcesMapper[i];
                 }
@@ -104,11 +106,35 @@ public class SqlSource {
                 if (resourcesSql.length > 0  &&  resourcesBig.length -resourcesSql.length <= i) {
                     resourcesBig[i] = resourcesSql[i - resourcesMapper.length-resourcesMapperSql.length];
                 }
+                if (resourcesSqlSql.length > 0  &&  resourcesBig.length -resourcesSqlSql.length <= i) {
+                    resourcesBig[i] = resourcesSqlSql[i - resourcesMapper.length-resourcesMapperSql.length-resourcesSql.length];
+                }
             }
             List<String> pathList = Lists.newArrayList();
             for (int i = 0; i < resourcesBig.length; i++) {
                 if (!pathList.contains(resourcesBig[i].getFile().getPath())) {
                     pathList.add(resourcesBig[i].getFile().getPath());
+                }
+            }*/
+            List<String> pathList = Lists.newArrayList();
+            for (int i = 0; i < resourcesMapper.length; i++) {
+                if (!pathList.contains(resourcesMapper[i].getFile().getPath())) {
+                    pathList.add(resourcesMapper[i].getFile().getPath());
+                }
+            }
+            for (int i = 0; i < resourcesMapperSql.length; i++) {
+                if (!pathList.contains(resourcesMapperSql[i].getFile().getPath())) {
+                    pathList.add(resourcesMapperSql[i].getFile().getPath());
+                }
+            }
+            for (int i = 0; i < resourcesSql.length; i++) {
+                if (!pathList.contains(resourcesSql[i].getFile().getPath())) {
+                    pathList.add(resourcesSql[i].getFile().getPath());
+                }
+            }
+            for (int i = 0; i < resourcesSqlSql.length; i++) {
+                if (!pathList.contains(resourcesSqlSql[i].getFile().getPath())) {
+                    pathList.add(resourcesSqlSql[i].getFile().getPath());
                 }
             }
 
@@ -460,6 +486,7 @@ public class SqlSource {
      * @return
      */
     public static String getUnknowFilePath(String ageKnowFile,String afterKnowFile){
+        urlBig="";
         String url="";
         String strTemp="";//临时判断用的
         File path = new File(ageKnowFile);

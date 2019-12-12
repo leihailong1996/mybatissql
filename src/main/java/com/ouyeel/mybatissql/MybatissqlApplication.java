@@ -40,7 +40,9 @@ public class MybatissqlApplication {
         System.out.println("=============================================================");
         System.out.println("python的路径是："+new MybatissqlApplication().pythonPyth);
 
-        List<FileHistory> fileHistoryListBig = SqlSource.getFileHistory("select * from file_history where  id  in (select file_history_id from pull_history where  id in (select pull_history_id from build_history where  id in (select max(id) from build_history where build_flag=1  group by module_ename) ))  and module_ename not like '%api%'");
+//        List<FileHistory> fileHistoryListBig = SqlSource.getFileHistory("select * from file_history where  id  in (select file_history_id from pull_history where  id in (select pull_history_id from build_history where  id in (select max(id) from build_history where build_flag=1  group by module_ename) ))  and module_ename not like '%api%'");
+        //加了一些特殊项目，不是maven项目，编译失败
+        List<FileHistory> fileHistoryListBig = SqlSource.getFileHistory("select * from file_history where  id  in (select file_history_id from pull_history where  id in (select pull_history_id from build_history where  id in (select max(id) from build_history where build_flag=1  group by module_ename) or id IN (SELECT max( id ) FROM build_history WHERE module_ename IN ( 'ttp', 'ttp-api', 'wl-ttp', 'wl-member', 'erp', 'wbsq', 'wbsq-api', 'ng-cloudAPI', 'oyys-olms', 'partnerservice','supplierservice', 		  'tmsservice', 'settleservice' ) GROUP BY module_ename)) )  and module_ename not like '%api%'");
         List<FileHistory> fileHistoryList = new ArrayList<FileHistory>();
         List<String> sqlFlagList = SqlSource.getSqlFlag("select * from sqlflag ");
         for(int i =0;i<fileHistoryListBig.size();i++){
@@ -60,9 +62,9 @@ public class MybatissqlApplication {
         int i =0;
 //        int sum=0;
         for(FileHistory fileHistory:fileHistoryList){
-//            if(!fileHistory.getModule_ename().equals("wl-api-deploy") || !fileHistory.getModule_ename().equals("wl-api-deploy")){
-//                continue;
-//            }
+            /*if(!fileHistory.getModule_ename().equals("account-ng")  ){
+                continue;
+            }*/
             i++;
             String classUrl=projectUrl+fileHistory.getPath();
             File file = new File(classUrl);
